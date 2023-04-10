@@ -1,0 +1,27 @@
+RUN mkdir -p ~/.ssh \
+    && touch ~/.ssh/authorized_keys \
+    && touch ~/.ssh/config \
+    && chmod 700 ~/.ssh \
+    && chmod 600 ~/.ssh/config \
+    && chmod 600 ~/.ssh/authorized_keys \
+    && tee -a ~/.ssh/config <<< 'Host *' \
+    && tee -a ~/.ssh/config <<< '    StrictHostKeyChecking no' \
+    && tee -a ~/.ssh/config <<< '    UserKnownHostsFile=/dev/null'
+
+ARG COMPLETE=true
+
+# use the COMPLETE arg, for a complete image, ready to boot.
+# otherwise use your own image: -v "$PWD/disk.img":/image
+ARG WGET_OPTIONS=
+# ARG WGET_OPTIONS='--no-verbose'
+
+# Feel free to take a copy of this image and then host it internally
+ARG IMAGE_URL='https://images.sick.codes/mac_hdd_ng_auto.img'
+# ARG IMAGE_URL='https://images.sick.codes/mac_hdd_ng_auto_big_sur.img'
+
+RUN if [[ "${COMPLETE}" ]]; then \
+        echo "Downloading 20GB image... This step might take a while... Press Ctrl+C if you want to abort." \
+        ; rm -f /home/arch/OSX-KVM/mac_hdd_ng.img \
+        && wget ${WGET_OPTIONS} -O /home/arch/OSX-KVM/mac_hdd_ng.img "${IMAGE_URL}" \
+    ; fi
+
