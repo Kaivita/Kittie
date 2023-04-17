@@ -1,0 +1,20 @@
+def whitelist(f):
+    return (f.endswith(".exe.config") and not f.endswith(".vshost.exe.config")) or \
+           (f.endswith(".exe") and not f.endswith(".vshost.exe")) or \
+           f.endswith(".dll") or \
+           f == "Help.htm"
+
+def main():
+    if os.path.exists(PROD_DIR):
+        shutil.rmtree(PROD_DIR)
+    os.mkdir(PROD_DIR)
+    for (rls_path, dirs, files) in os.walk(RELEASE_DIR):
+        prod_path = PROD_DIR + rls_path[len(RELEASE_DIR):]
+        for d in dirs:
+            os.mkdir(os.path.join(prod_path, d))
+        for f in files:
+            if whitelist(f):
+                shutil.copyfile(os.path.join(rls_path, f), os.path.join(prod_path, f))
+
+if __name__ == "__main__":
+    main()
